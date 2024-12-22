@@ -125,21 +125,60 @@
       }
 
       /* New Hover Effects Section */
+      /* Grid layout for the hover cards */
       .hover-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 2rem;
         padding: 4rem 2rem;
+        transition: transform 0.5s ease; /* Smooth horizontal movement */
+        position: relative; /* Keep position for movement */
       }
 
+      /* Styling for each card */
       .hover-card {
-        height: 200px;
-        background: linear-gradient(45deg, var(--accent), var(--highlight));
+        width: 250px; /* Image size */
+        height: 250px; /* Image size */
+        background-size: cover; /* Image cover */
+        background-position: center;
         border-radius: 15px;
-        transform-style: preserve-3d;
-        transition: all 0.5s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+      /* Add hover effects to the card */
+      .hover-card:hover {
+        transform: rotateY(15deg) scale(1.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       }
 
+      /* Add overlay effect when hovering */
+      .hover-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1;
+      }
+
+      .hover-card:hover::after {
+        opacity: 1; /* Show the overlay on hover */
+      }
+
+      /* Text inside the hover card */
+      .hover-card .text {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
       /* Animations */
       @keyframes rotate {
         from {
@@ -645,7 +684,14 @@
     <section class="product-gallery">
       <div class="product-card">
         <div class="product-image-container">
-          <div class="product-image"></div>
+          <div class="product-image">
+            <img
+              src="images/hand_watch.png"
+              width="100%"
+              height="100%"
+              alt=""
+            />
+          </div>
         </div>
         <div class="product-details">
           <h3 class="product-title">Gaming Headset Pro</h3>
@@ -742,26 +788,70 @@
 
       // Create hover grid
       const hoverGrid = document.querySelector(".hover-grid");
-      for (let i = 0; i < 6; i++) {
+
+      // Image URLs
+      const imageUrls = [
+        "images/img_of_store_ecommerce_watches.png",
+        "images/img_of_store_ecommerce_watches.png",
+        "images/img_of_store_ecommerce_watches.png",
+        "images/img_of_store_ecommerce_watches.png",
+        "images/img_of_store_ecommerce_watches.png",
+        "images/img_of_store_ecommerce_watches.png",
+      ];
+
+      // Dynamically create cards with images
+      imageUrls.forEach((url) => {
         const card = document.createElement("div");
         card.className = "hover-card";
+        card.style.backgroundImage = `url(${url})`;
         hoverGrid.appendChild(card);
+      });
+      // Variables to track scroll direction and movement
+      let lasteScrollTop = 0;
+      let movementAmount = 0;
+      const movementSpeed = 3; // Adjust the speed of horizontal movement
 
-        // Add hover effect
-        card.addEventListener("mousemove", (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
+      // Add scroll event listener for horizontal movement
+      window.addEventListener("scroll", function () {
+        let currentScroll =
+          window.pageYOffset || document.documentElement.scrollTop;
 
-          const shine = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.2), transparent)`;
-          card.style.background = `linear-gradient(45deg, var(--accent), var(--highlight)), ${shine}`;
-        });
+        // Check scroll direction and update movementAmount
+        if (currentScroll > lastScrollTop) {
+          // Scrolling down, move left (negative direction)
+          movementAmount -= movementSpeed;
+        } else {
+          // Scrolling up, move right (positive direction)
+          movementAmount += movementSpeed;
+        }
 
-        card.addEventListener("mouseleave", () => {
-          card.style.background =
-            "linear-gradient(45deg, var(--accent), var(--highlight))";
-        });
-      }
+        // Apply the horizontal movement to the hover grid
+        hoverGrid.style.transform = `translateX(${movementAmount}px)`;
+
+        // Update the last scroll position to current
+        lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+      });
+
+      // Variables to track scroll direction
+      let lastScrollTop = 0;
+
+      // Add scroll event listener to move grid
+      window.addEventListener("scroll", function () {
+        let currentScroll =
+          window.pageYOffset || document.documentElement.scrollTop;
+
+        // Check scroll direction
+        if (currentScroll > lastScrollTop) {
+          // Scrolling down, move grid left
+          hoverGrid.style.transform = "translateX(-20px)";
+        } else {
+          // Scrolling up, move grid right
+          hoverGrid.style.transform = "translateX(20px)";
+        }
+
+        // Update the last scroll position to current
+        lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+      });
 
       // Add scroll animation
       const sectionObserver = new IntersectionObserver((entries) => {
@@ -927,7 +1017,8 @@
         card.className = "product-card";
         card.innerHTML = `
                 <div class="product-image-container">
-                    <div class="product-image"></div>
+                    <div class="product-image">
+                     <img src="images/hand_watch.png" width=100% height=100%> </div>
                 </div>
                 <div class="product-details">
                     <h3 class="product-title">${product.title}</h3>
